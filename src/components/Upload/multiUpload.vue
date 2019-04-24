@@ -1,10 +1,12 @@
 <template> 
   <div>
     <el-upload
-      action="http://macro-oss.oss-cn-shenzhen.aliyuncs.com"
+      action=""
       :data="dataObj"
       list-type="picture-card"
       :file-list="fileList"
+      :auto-upload='false'
+      :on-change="getFile"
       :before-upload="beforeUpload"
       :on-remove="handleRemove"
       :on-success="handleUploadSuccess"
@@ -60,7 +62,9 @@
       emitInput(fileList) {
         let value=[];
         for(let i=0;i<fileList.length;i++){
-          value.push(fileList[i].url);
+			this.getBase64(fileList[i].raw).then(res => {
+				value.push(res);		
+			});
         }
         this.$emit('input', value)
       },
@@ -99,6 +103,27 @@
           duration:1000
         });
       },
+      	getFile (res,fileList) {
+			console.log('jcjdh',resfileList,fileList);	  
+			this.emitInput(fileList);
+		},
+		// 把图片地址转换成base64位
+		getBase64(file) {
+			return new Promise(function(resolve, reject) {
+				let reader = new FileReader();
+				let imgResult = "";
+				reader.readAsDataURL(file);
+				reader.onload = function() {
+					imgResult = reader.result;
+				};
+				reader.onerror = function(error) {
+					reject(error);
+				};
+				reader.onloadend = function() {
+					resolve(imgResult);
+				};
+			});
+		},
     }
   }
 </script>
