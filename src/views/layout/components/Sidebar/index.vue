@@ -20,17 +20,20 @@ import SidebarItem from './SidebarItem'
 import ScrollBar from '@/components/ScrollBar'
 
 export default {
-  components: { SidebarItem, ScrollBar },
-  computed: {
-    ...mapGetters([
-      'sidebar'
-    ]),
-    routes() {
-      return this.$router.options.routes
+    components: { SidebarItem, ScrollBar },
+    computed: {
+        ...mapGetters([
+            'sidebar'
+        ]),
+        routes() {
+            return this.$router.options.routes
+        },
+        isCollapse() {
+            return !this.sidebar.opened
+        }
     },
-    isCollapse() {
-      return !this.sidebar.opened
+    mounted () {
+        console.log(this.$router);        
     }
-  }
 }
 </script>

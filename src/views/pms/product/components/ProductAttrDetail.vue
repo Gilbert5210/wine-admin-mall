@@ -3,7 +3,6 @@
     <el-form :model="value" ref="productAttrForm" label-width="120px" style="width: 820px" size="small">
       <el-form-item label="商品相册：">
         <multi-upload v-model="selectProductAttrPics"></multi-upload>
-		{{selectProductAttrPics}}
       </el-form-item>
       <el-form-item label="规格参数：">
 		  <Tinymce class='editor' v-model='value.detailHtml' ></Tinymce>	
