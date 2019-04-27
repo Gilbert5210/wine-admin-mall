@@ -21,12 +21,12 @@
       <div style="margin-top: 15px">
         <el-form :inline="true" :model="listQuery" size="small" label-width="140px">
           <el-form-item label="输入搜索：">
-            <el-input style="width: 203px" v-model="listQuery.keyword" placeholder="商品名称"></el-input>
+            <el-input style="width: 203px" v-model="listQuery.keyword" placeholder="文章名称"></el-input>
           </el-form-item>
           <!-- <el-form-item label="商品货号：">
             <el-input style="width: 203px" v-model="listQuery.productSn" placeholder="商品货号"></el-input>
           </el-form-item> -->
-          <el-form-item label="商品标签：">
+          <el-form-item label="文章标签：">
             <el-cascader
               clearable
               v-model="selectProductCateValue"
@@ -68,7 +68,7 @@
     </el-card>
     <el-card class="operate-container" shadow="never">
       <i class="el-icon-tickets"></i>
-      <span>数据列表</span>
+      <span>文章列表</span>
       <el-button
         class="btn-add"
         @click="handleAddProduct()"
@@ -84,7 +84,7 @@
                 v-loading="listLoading"
                 border>
         <el-table-column type="selection" width="60" align="center"></el-table-column>
-        <el-table-column label="编号" width="100" align="center">
+        <el-table-column label="编号" width="80" align="center">
           <template slot-scope="scope">{{scope.row.id}}</template>
         </el-table-column>
         <el-table-column label="文章封面图片" width="120" align="center">
@@ -102,8 +102,10 @@
             <!-- <p>货号：{{scope.row.productSn}}</p> -->
           </template>
         </el-table-column>
-        <el-table-column label="标签" width="140" align="center">
+        <el-table-column label="标签" width="208" align="center">
           <template slot-scope="scope">
+              <el-tag>标签一</el-tag>
+              <el-tag>标签二</el-tag>
             <!-- <p>上架：
               <el-switch
                 @change="handlePublishStatusChange(scope.$index, scope.row)"
@@ -112,7 +114,7 @@
                 v-model="scope.row.publishStatus">
               </el-switch>
             </p> -->
-            <p>新品：
+            <!-- <p>新品：
               <el-switch
                 @change="handleNewStatusChange(scope.$index, scope.row)"
                 :active-value="1"
@@ -127,10 +129,13 @@
                 :inactive-value="0"
                 v-model="scope.row.recommandStatus">
               </el-switch>
-            </p>
+            </p> -->
           </template>
         </el-table-column>
         <el-table-column label="排序" width="100" align="center">
+          <template slot-scope="scope">{{scope.row.sort}}</template>
+        </el-table-column>
+        <el-table-column label="推荐" width="100" align="center">
           <template slot-scope="scope">{{scope.row.sort}}</template>
         </el-table-column>
         <!-- <el-table-column label="SKU库存" width="100" align="center">
@@ -138,9 +143,9 @@
             <el-button type="primary" icon="el-icon-edit" @click="handleShowSkuEditDialog(scope.$index, scope.row)" circle></el-button>
           </template>
         </el-table-column> -->
-        <el-table-column label="销量" width="100" align="center">
+        <!-- <el-table-column label="销量" width="100" align="center">
           <template slot-scope="scope">{{scope.row.sale}}</template>
-        </el-table-column>
+        </el-table-column> -->
         <!-- <el-table-column label="审核状态" width="100" align="center">
           <template slot-scope="scope">
             <p>{{scope.row.verifyStatus | verifyStatusFilter}}</p>
@@ -155,16 +160,14 @@
         <el-table-column label="操作" width="160" align="center">
           <template slot-scope="scope">
             <p>
-              <el-button
+              <!-- <el-button
                 size="mini"
                 @click="handleShowProduct(scope.$index, scope.row)">查看
-              </el-button>
+              </el-button> -->
               <el-button
                 size="mini"
                 @click="handleUpdateProduct(scope.$index, scope.row)">编辑
               </el-button>
-            </p>
-            <p>
               <!-- <el-button
                 size="mini"
                 @click="handleShowLog(scope.$index, scope.row)">日志
@@ -580,7 +583,7 @@
         });
       },
       handleUpdateProduct(index,row){
-        this.$router.push({path:'/pms/updateProduct',query:{id:row.id}});
+        this.$router.push({path:'/article/addArticle',query:{id:row.id}});
       },
       handleShowProduct(index,row){
         console.log("handleShowProduct",row);

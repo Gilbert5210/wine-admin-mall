@@ -37,7 +37,7 @@
                     </el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="分类选择" prop="classList">
+            <!-- <el-form-item label="分类选择" prop="classList">
                 <el-select
                         v-model="ruleForm.classList"
                         allow-create
@@ -52,16 +52,13 @@
                             :value="item.id">
                     </el-option>
                 </el-select>
-            </el-form-item>
+            </el-form-item> -->
             <el-form-item label="权限设置">
-                <el-radio-group v-model="ruleForm.commentPermission">
-                    <el-radio :label="1">允许所有人评论</el-radio>
-                    <el-radio :label="0">不允许评论</el-radio>
-                </el-radio-group>
-                <el-checkbox-group v-model="ruleForm.visiblePermission">
-                    <el-checkbox label="仅自己可见" name="type"></el-checkbox>
-                    <el-checkbox label="禁止转载" name="type"></el-checkbox>
-                </el-checkbox-group>
+                <span>推荐：</span>
+                <el-switch
+                    :active-value="1"
+                    :inactive-value="0"
+                    v-model="ruleForm.recommendFlag" />
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="submitForm('ruleForm')">立即发布</el-button>
@@ -93,9 +90,10 @@
                     titleText: '',  //文章标题
                     content: '',    //文章内容
                     labelList: [],//标签列表
-                    classList: [],//分类选择
-                    commentPermission:'',
-                    visiblePermission:[],
+                    // classList: [],//分类选择
+                    recommendFlag: 0,   //推荐
+                    // commentPermission:'',
+                    // visiblePermission:[],
                     imageUrl: ''
                 },
                 articleCategoryLists:[

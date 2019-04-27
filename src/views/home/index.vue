@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <div class="address-layout" v-if="false">
+    <!-- <div class="address-layout" v-if="false">
       <el-row :gutter="20">
         <el-col :span="12">
           <div class="out-border">
@@ -19,7 +19,7 @@
           </div>
         </el-col>
       </el-row>
-    </div>
+    </div> -->
     <div class="total-layout">
       <el-row :gutter="20">
         <el-col :span="6">
@@ -38,14 +38,14 @@
             <div class="total-value">￥5000.00</div>
           </div>
         </el-col>
-        <el-col :span="6">
+        <!-- <el-col :span="6">
           <div class="total-frame">
             <svg-icon icon-class="total-yesterday" class="total-icon">
             </svg-icon>
             <div class="total-title">昨日销售总额</div>
             <div class="total-value">￥5000.00</div>
           </div>
-        </el-col>
+        </el-col> -->
         <el-col :span="6">
           <div class="total-frame">
             <svg-icon icon-class="total-week" class="total-icon">
@@ -129,7 +129,7 @@
     </div>
     <div class="overview-layout">
       <el-row :gutter="20">
-        <el-col :span="12">
+        <el-col :span="12" class="layout-item">
           <div class="out-border">
             <div class="layout-title">商品总览</div>
             <div style="padding: 40px">
@@ -148,7 +148,26 @@
             </div>
           </div>
         </el-col>
-        <el-col :span="12">
+        <el-col :span="12" class="layout-item">
+          <div class="out-border">
+            <div class="layout-title">文章总览</div>
+            <div style="padding: 40px">
+              <el-row>
+                <el-col :span="6" class="color-danger overview-item-value">100</el-col>
+                <!-- <el-col :span="6" class="color-danger overview-item-value">400</el-col> -->
+                <!-- <el-col :span="6" class="color-danger overview-item-value">50</el-col> -->
+                <el-col :span="6" class="color-danger overview-item-value">500</el-col>
+              </el-row>
+              <el-row class="font-medium">
+                <el-col :span="6" class="overview-item-title">最新的文章</el-col>
+                <!-- <el-col :span="6" class="overview-item-title">已上架</el-col> -->
+                <!-- <el-col :span="6" class="overview-item-title">库存紧张</el-col> -->
+                <el-col :span="6" class="overview-item-title">全部文章</el-col>
+              </el-row>
+            </div>
+          </div>
+        </el-col>
+        <el-col :span="12" class="layout-item">
           <div class="out-border">
             <div class="layout-title">用户总览</div>
             <div style="padding: 40px">
@@ -343,7 +362,7 @@
   }
 </script>
 
-<style scoped>
+<style lang='scss' scoped>
   .app-container {
     margin-top: 40px;
     margin-left: 120px;
@@ -408,6 +427,9 @@
 
   .overview-layout {
     margin-top: 20px;
+    .layout-item {
+        margin-bottom: 20px;
+    }
   }
 
   .overview-item-value {

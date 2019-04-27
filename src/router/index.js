@@ -57,6 +57,15 @@ export const constantRouterMap = [
                     title: '添加文章',
                     icon: 'product-add'
                 }
+            },
+            {
+                path: 'tags',
+                name: 'tags',
+                component: () => import('@/views/article/tags'),
+                meta: {
+                    title: '标签列表',
+                    icon: 'tag'
+                }
             }
         ]
     },

@@ -96,6 +96,12 @@
             <p>品牌：{{scope.row.brandName}}</p>
           </template>
         </el-table-column>
+        <el-table-column label="商品类型" align="center">
+          <template slot-scope="scope">
+            <!-- <p>{{scope.row.name}}</p> -->
+            <span>甜白</span>
+          </template>
+        </el-table-column>
         <el-table-column label="价格" width="120" align="center">
           <template slot-scope="scope">
             <p>价格：￥{{scope.row.price}}</p>
@@ -133,11 +139,11 @@
         <el-table-column label="排序" width="100" align="center">
           <template slot-scope="scope">{{scope.row.sort}}</template>
         </el-table-column>
-        <el-table-column label="SKU库存" width="100" align="center">
+        <!-- <el-table-column label="SKU库存" width="100" align="center">
           <template slot-scope="scope">
             <el-button type="primary" icon="el-icon-edit" @click="handleShowSkuEditDialog(scope.$index, scope.row)" circle></el-button>
           </template>
-        </el-table-column>
+        </el-table-column> -->
         <el-table-column label="销量" width="100" align="center">
           <template slot-scope="scope">{{scope.row.sale}}</template>
         </el-table-column>
