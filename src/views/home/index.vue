@@ -27,7 +27,7 @@
             <svg-icon icon-class="order" class="total-icon">
             </svg-icon>
             <div class="total-title">今日订单总数</div>
-            <div class="total-value">200</div>
+            <div class="total-value">{{orderTotaLists.todayCount}}</div>
           </div>
         </el-col>
         <el-col :span="6">
@@ -35,7 +35,7 @@
             <svg-icon icon-class="total-today" class="total-icon">
             </svg-icon>
             <div class="total-title">今日销售总额</div>
-            <div class="total-value">￥5000.00</div>
+            <div class="total-value">{{orderTotaLists.todayAmount}}</div>
           </div>
         </el-col>
         <!-- <el-col :span="6">
@@ -50,8 +50,8 @@
           <div class="total-frame">
             <svg-icon icon-class="total-week" class="total-icon">
             </svg-icon>
-            <div class="total-title">近7天销售总额</div>
-            <div class="total-value">￥50000.00</div>
+            <div class="total-title">总的下单总数</div>
+            <div class="total-value">{{orderTotaLists.totalCount}}</div>
           </div>
         </el-col>
       </el-row>
@@ -134,13 +134,13 @@
             <div class="layout-title">商品总览</div>
             <div style="padding: 40px">
               <el-row>
-                <el-col :span="6" class="color-danger overview-item-value">100</el-col>
-                <el-col :span="6" class="color-danger overview-item-value">400</el-col>
-                <el-col :span="6" class="color-danger overview-item-value">50</el-col>
-                <el-col :span="6" class="color-danger overview-item-value">500</el-col>
+                <!-- <el-col :span="6" class="color-danger overview-item-value">100</el-col> -->
+                <el-col :span="6" class="color-danger overview-item-value">{{goodsTotalLists.isSaleCount}}</el-col>
+                <el-col :span="6" class="color-danger overview-item-value">{{goodsTotalLists.lowStockCount}}</el-col>
+                <el-col :span="6" class="color-danger overview-item-value">{{goodsTotalLists.totalCount}}</el-col>
               </el-row>
               <el-row class="font-medium">
-                <el-col :span="6" class="overview-item-title">已下架</el-col>
+                <!-- <el-col :span="6" class="overview-item-title">已下架</el-col> -->
                 <el-col :span="6" class="overview-item-title">已上架</el-col>
                 <el-col :span="6" class="overview-item-title">库存紧张</el-col>
                 <el-col :span="6" class="overview-item-title">全部商品</el-col>
@@ -259,6 +259,9 @@
 
 <script>
   import {str2Date} from '@/utils/date';
+    import {
+        getGoodsData, getOrderData 
+    } from '@/api/api';
   const DATA_FROM_BACKEND = {
     columns: ['date', 'orderCount','orderAmount'],
     rows: [
@@ -319,12 +322,16 @@
           rows: []
         },
         loading: false,
-        dataEmpty: false
+        dataEmpty: false,
+        goodsTotalLists: {},
+        orderTotaLists: {},
       }
     },
     created(){
       this.initOrderCountDate();
       this.getData();
+      this.getGoodsDataList();
+      this.getOrderDataList();
     },
     methods:{
       handleDateChange(){
@@ -357,6 +364,16 @@
           this.dataEmpty = false;
           this.loading = false
         }, 1000)
+      }, 
+      getGoodsDataList () {
+          getGoodsData().then( res => {
+              this.goodsTotalLists = res.data.data;
+          })
+      },
+      getOrderDataList () {
+           getOrderData().then( res => {
+              this.orderTotaLists = res.data.data;
+          })
       }
     }
   }

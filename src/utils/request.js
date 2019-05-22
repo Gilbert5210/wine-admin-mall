@@ -3,17 +3,26 @@ import { Message, MessageBox } from 'element-ui'
 import store from '../store'
 import { getToken } from '@/utils/auth'
 
-// 创建axios实例
-const service = axios.create({
-  baseURL: process.env.BASE_API, // api的base_url
-  timeout: 15000 // 请求超时时间
-})
+// // 创建axios实例
+// axios.create({
+//   baseURL: process.env.BASE_API, // api的base_url
+//   timeout: 15000 // 请求超时时间
+// })
 
+let baseUrl = process.env.BASE_API;
+console.log('后台地址：',baseUrl);
+axios.defaults.baseURL = baseUrl;
+
+axios.defaults.withCredentials = false;
 // request拦截器
-service.interceptors.request.use(config => {
-  if (store.getters.token) {
-    config.headers['Authorization'] = getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
-  }
+axios.interceptors.request.use(config => {
+//   if (store.getters.token) {
+    if (localStorage.getItem('userToken')) {
+        config.headers.common['token'] = JSON.parse(localStorage.getItem('userToken')).token;
+        config.headers.common['userId'] = JSON.parse(localStorage.getItem('userToken')).userId;
+    }
+    // config.headers['Authorization'] = getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
+//   }
   return config
 }, error => {
   // Do something with request error
@@ -22,17 +31,17 @@ service.interceptors.request.use(config => {
 })
 
 // respone拦截器
-service.interceptors.response.use(
+axios.interceptors.response.use(
   response => {
   /**
   * code为非200是抛错 可结合自己业务进行修改
   */
     const res = response.data
-    if (res.code !== 200) {
+    if (res.code !== 0) {
       Message({
-        message: res.message,
+        message: res.msg,
         type: 'error',
-        duration: 3 * 1000
+        duration: 1 * 1000
       })
 
       // 401:未登录;
@@ -49,7 +58,7 @@ service.interceptors.response.use(
       }
       return Promise.reject('error')
     } else {
-      return response.data
+      return response
     }
   },
   error => {
@@ -63,4 +72,4 @@ service.interceptors.response.use(
   }
 )
 
-export default service
+export default axios

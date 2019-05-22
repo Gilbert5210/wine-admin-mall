@@ -58,20 +58,20 @@
 </template>
 
 <script>
-  import {isvalidUsername} from '@/utils/validate';
-  import {setSupport,getSupport,SupportUrl} from '@/utils/support';
-  import login_center_bg from '@/assets/images/login_center_bg.png'
-
+import {isvalidUsername} from '@/utils/validate';
+import {setSupport,getSupport,SupportUrl} from '@/utils/support';
+import login_center_bg from '@/assets/images/login_center_bg.png'
+import {checkUserName, userLogin} from '../../api/api'
   export default {
     name: 'login',
     data() {
-      const validateUsername = (rule, value, callback) => {
-        if (!isvalidUsername(value)) {
-          callback(new Error('请输入正确的用户名'))
-        } else {
-          callback()
-        }
-      };
+        const validateUsername = (rule, value, callback) => {
+            if (!isvalidUsername(value)) {
+                callback(new Error('请输入正确的用户名'))
+            } else {
+                callback()
+            }
+        };
       const validatePass = (rule, value, callback) => {
         if (value.length < 3) {
           callback(new Error('密码不能小于3位'))
@@ -105,36 +105,40 @@
       handleLogin() {
         this.$refs.loginForm.validate(valid => {
           if (valid) {
-            let isSupport = getSupport();
-            if(isSupport===undefined||isSupport==null){
-                //   this.dialogVisible =true;
-                setSupport(false);
-                // window.location.href=SupportUrl;
-                return;
-            }
+            // let isSupport = getSupport();
+            // if(isSupport===undefined||isSupport==null){
+            //     //   this.dialogVisible =true;
+            //     setSupport(false);
+            //     // window.location.href=SupportUrl;
+            //     return;
+            // }
             this.loading = true;
             this.$store.dispatch('Login', this.loginForm).then(() => {
-              this.loading = false;
-              this.$router.push({path: '/'})
+                // debugger
+                this.loading = false;
+                this.$router.push({path: '/home'})
             }).catch(() => {
-              this.loading = false
+                this.loading = false
             })
           } else {
-            console.log('参数验证不合法！');
-            return false
+                console.log('参数验证不合法！');
+                return false
           }
         })
       },
       dialogConfirm(){
         this.dialogVisible =false;
-        setSupport(true);
+        // setSupport(true);
         window.location.href=SupportUrl;
       },
       dialogCancel(){
         this.dialogVisible = false;
-        setSupport(false);
+        // setSupport(false);
       }
-    }
+    },
+    mounted() {
+       
+    },
   }
 </script>
 

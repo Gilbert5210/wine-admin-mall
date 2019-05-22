@@ -76,29 +76,23 @@
                 @selection-change="handleSelectionChange"
                 v-loading="listLoading" border>
         <el-table-column type="selection" width="60" align="center"></el-table-column>
-        <el-table-column label="编号" width="80" align="center">
-          <template slot-scope="scope">{{scope.row.id}}</template>
+        <el-table-column label="编号" type="index" width="50" align="center">
         </el-table-column>
         <el-table-column label="订单编号" width="180" align="center">
-          <template slot-scope="scope">{{scope.row.orderSn}}</template>
+          <template slot-scope="scope">{{scope.row.order.id}}</template>
         </el-table-column>
-        <el-table-column label="提交时间" width="180" align="center">
-          <template slot-scope="scope">{{scope.row.createTime | formatCreateTime}}</template>
-        </el-table-column>
-        <el-table-column label="用户账号" align="center">
-          <template slot-scope="scope">{{scope.row.memberUsername}}</template>
+        
+        <el-table-column label="收件人" align="center">
+          <template slot-scope="scope">{{scope.row.order.name}}</template>
         </el-table-column>
         <el-table-column label="订单金额" width="120" align="center">
-          <template slot-scope="scope">￥{{scope.row.totalAmount}}</template>
+          <template slot-scope="scope">￥{{scope.row.order.totalAmount}}</template>
         </el-table-column>
-        <el-table-column label="支付方式" width="120" align="center">
-          <template slot-scope="scope">{{scope.row.payType | formatPayType}}</template>
-        </el-table-column>
-        <el-table-column label="订单来源" width="120" align="center">
-          <template slot-scope="scope">{{scope.row.sourceType | formatSourceType}}</template>
+        <el-table-column label="提交时间" width="180" align="center">
+          <template slot-scope="scope">{{scope.row.order.createAt}}</template>
         </el-table-column>
         <el-table-column label="订单状态" width="120" align="center">
-          <template slot-scope="scope">{{scope.row.status | formatStatus}}</template>
+          <template slot-scope="scope">{{scope.row.order.status | formatStatus}}</template>
         </el-table-column>
         <el-table-column label="操作" width="200" align="center">
           <template slot-scope="scope">
@@ -106,23 +100,23 @@
               size="mini"
               @click="handleViewOrder(scope.$index, scope.row)"
             >查看订单</el-button>
-            <el-button
+            <!-- <el-button
               size="mini"
               @click="handleCloseOrder(scope.$index, scope.row)"
-              v-show="scope.row.status===0">关闭订单</el-button>
+              v-show="scope.row.order.status===0">关闭订单</el-button> -->
             <el-button
               size="mini"
               @click="handleDeliveryOrder(scope.$index, scope.row)"
-              v-show="scope.row.status===1">订单发货</el-button>
+              v-show="scope.row.order.status===1">订单发货</el-button>
             <el-button
               size="mini"
               @click="handleViewLogistics(scope.$index, scope.row)"
-              v-show="scope.row.status===2||scope.row.status===3">订单跟踪</el-button>
+              v-show="scope.row.order.status===2||scope.row.status===3">订单跟踪</el-button>
             <el-button
               size="mini"
               type="danger"
               @click="handleDeleteOrder(scope.$index, scope.row)"
-              v-show="scope.row.status===4">删除订单</el-button>
+              v-show="scope.row.order.status===3">删除订单</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -180,17 +174,13 @@
 </template>
 <script>
   import {fetchList,closeOrder,deleteOrder} from '@/api/order'
+  import {selectOrderList} from '@/api/api'
   import {formatDate} from '@/utils/date';
   import LogisticsDialog from '@/views/oms/order/components/logisticsDialog';
   const defaultListQuery = {
-    pageNum: 1,
-    pageSize: 10,
-    orderSn: null,
-    receiverKeyword: null,
-    status: null,
-    orderType: null,
-    sourceType: null,
-    createTime: null,
+    // userId: "",  //用户id
+    statusList: [0,1,2],  //订单状态数组 0:代付款 1:待发货 2:已发货 3:已完成
+    // name: ""  //用户名
   };
   export default {
     name: "orderList",
@@ -298,10 +288,6 @@
           return '已发货';
         } else if (value === 3) {
           return '已完成';
-        } else if (value === 4) {
-          return '已关闭';
-        } else if (value === 5) {
-          return '无效订单';
         } else {
           return '待付款';
         }
@@ -412,12 +398,15 @@
         });
       },
       getList() {
-        this.listLoading = true;
-        fetchList(this.listQuery).then(response => {
-          this.listLoading = false;
-          this.list = response.data.list;
-          this.total = response.data.total;
-        });
+            this.listLoading = true;
+            let params = {
+                statusList: [0,1 ,2 , 3]
+            }
+            selectOrderList(params).then(response => {
+                this.listLoading = false;
+                this.list = response.data.data;
+                this.total = response.data.data.length;
+            });
       },
       deleteOrder(ids){
         this.$confirm('是否要进行该删除操作?', '提示', {

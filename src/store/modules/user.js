@@ -1,4 +1,5 @@
 import { login, logout, getInfo } from '@/api/login'
+import {userLogin} from '../../api/api'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 
 const user = {
@@ -27,18 +28,23 @@ const user = {
   actions: {
     // 登录
     Login({ commit }, userInfo) {
-      const username = userInfo.username.trim()
-      return new Promise((resolve, reject) => {
-        login(username, userInfo.password).then(response => {
-          const data = response.data
-          const tokenStr = data.tokenHead+data.token
-          setToken(tokenStr)
-          commit('SET_TOKEN', tokenStr)
-          resolve()
-        }).catch(error => {
-          reject(error)
+        const username = userInfo.username.trim()
+        return new Promise((resolve, reject) => {
+            let params = {
+                userName: username,
+                password: userInfo.password,
+            }
+            userLogin(params).then(response => {
+                const data = response.data
+                // const tokenStr = data.tokenHead+data.token
+                // setToken(tokenStr)
+                window.localStorage.setItem('userToken', JSON.stringify(data));
+                commit('SET_TOKEN', data.token)
+                resolve()
+            }).catch(error => {
+                reject(error)
+            })
         })
-      })
     },
 
     // 获取用户信息

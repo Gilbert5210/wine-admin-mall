@@ -38,19 +38,18 @@
                 v-loading="listLoading"
                 border>
         <el-table-column type="selection" width="60" align="center"></el-table-column>
-        <el-table-column label="编号" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.id}}</template>
+        <el-table-column label="编号" type="index" width="100" align="center">
         </el-table-column>
         <el-table-column label="品牌名称" align="center">
-          <template slot-scope="scope">{{scope.row.name}}</template>
+          <template slot-scope="scope">{{scope.row.brandName}}</template>
         </el-table-column>
-        <el-table-column label="品牌首字母" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.firstLetter}}</template>
+        <el-table-column label="品牌序号" width="100" align="center">
+          <template slot-scope="scope">{{scope.row.type}}</template>
         </el-table-column>
-        <el-table-column label="排序" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.sort}}</template>
+        <el-table-column label="创建时间" width="200" align="center">
+          <template slot-scope="scope">{{scope.row.createAt}}</template>
         </el-table-column>
-        <el-table-column label="品牌制造商" width="100" align="center">
+        <!-- <el-table-column label="品牌制造商" width="100" align="center">
           <template slot-scope="scope">
             <el-switch
               @change="handleFactoryStatusChange(scope.$index, scope.row)"
@@ -59,8 +58,8 @@
               v-model="scope.row.factoryStatus">
             </el-switch>
           </template>
-        </el-table-column>
-        <el-table-column label="是否显示" width="100" align="center">
+        </el-table-column> -->
+        <!-- <el-table-column label="是否显示" width="100" align="center">
           <template slot-scope="scope">
             <el-switch
               @change="handleShowStatusChange(scope.$index, scope.row)"
@@ -69,8 +68,8 @@
               v-model="scope.row.showStatus">
             </el-switch>
           </template>
-        </el-table-column>
-        <el-table-column label="相关" width="220" align="center">
+        </el-table-column> -->
+        <!-- <el-table-column label="相关" width="220" align="center">
           <template slot-scope="scope">
             <span>商品：</span>
             <el-button
@@ -85,7 +84,7 @@
               @click="getProductCommentList(scope.$index, scope.row)">1000
             </el-button>
           </template>
-        </el-table-column>
+        </el-table-column> -->
         <el-table-column label="操作" width="200" align="center">
           <template slot-scope="scope">
             <el-button
@@ -95,7 +94,7 @@
             <el-button
               size="mini"
               type="danger"
-              @click="handleDelete(scope.$index, scope.row)">删除
+              @click="handleDelete(scope.$index, scope.row.id)">删除
             </el-button>
           </template>
         </el-table-column>
@@ -133,11 +132,31 @@
         :total="total">
       </el-pagination>
     </div>
+    <el-dialog
+        :title="dialogTitle"
+        :visible.sync="dialogVisible"
+        width="30%">
+        <el-form ref="branchAttr" :model="branchAttr" :rules="rules" label-width="120px">
+            <el-form-item label="品牌序号" prop="type">
+                <el-input v-model="branchAttr.type" :disabled="editingCategroy" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="品牌名称" prop="name">
+                <el-input v-model="branchAttr.name" auto-complete="off"></el-input>
+            </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+            <el-button @click="cancelKindBtn('branchAttr')">取 消</el-button>
+            <el-button type="primary" @click="handleConfirm('branchAttr')">确 定</el-button>
+        </span>
+    </el-dialog>
   </div>
 </template>
 <script>
   import {fetchList, updateShowStatus, updateFactoryStatus, deleteBrand} from '@/api/brand'
-
+    import {addGoodsBrand, deleteGoodsBrandById,
+            updateGoodsBrandById, selectGoodsBrandById,
+            selectAllGoodsBrand
+    } from '@/api/api';
   export default {
     name: 'brandList',
     data() {
@@ -152,6 +171,14 @@
             value: "hideBrand"
           }
         ],
+        dialogVisible: false,
+        editingCategroy: false,
+        dialogTitle: '',
+        branchAttr: {
+            name:'',
+            type:'',
+            id: ''
+        },
         operateType: null,
         listQuery: {
           keyword: null,
@@ -161,7 +188,15 @@
         list: null,
         total: null,
         listLoading: true,
-        multipleSelection: []
+        multipleSelection: [],
+        rules: {
+            name: [
+                { required: true, message: '请输入类型名称', trigger: 'blur' }
+            ],
+            type:[
+                { required: true, message: '请输入序号', trigger: 'blur' }
+            ]
+        }
       }
     },
     created() {
@@ -170,19 +205,72 @@
     methods: {
       getList() {
         this.listLoading = true;
-        fetchList(this.listQuery).then(response => {
-          this.listLoading = false;
-          this.list = response.data.list;
-          this.total = response.data.total;
-          this.totalPage = response.data.totalPage;
-          this.pageSize = response.data.pageSize;
+        selectAllGoodsBrand().then(res => {
+            if (res.data.code) {
+                this.$message.error(res.data.msg || '删除分类失败');
+                return
+            }
+            this.listLoading = false;
+            this.list = res.data.data;
+            this.total = res.data.data && res.data.data.length || 0;
+        //   this.totalPage = response.data.totalPage;
+        //   this.pageSize = response.data.pageSize;
         });
       },
+        cancelKindBtn (formName) {
+            // this.$refs[formName].resetFields();
+            this.dialogVisible = false;
+            this.branchAttr.name = '';
+            this.branchAttr.type = '';
+            this.branchAttr.id = '';
+        },
+
+        handleConfirm(formName){
+            this.$refs[formName].validate((valid) => {
+            if (valid) {
+                let params = {
+                    brandName: this.branchAttr.name
+                };
+                if(this.dialogTitle==="添加品牌"){
+                    params.type = this.branchAttr.type;
+                    addGoodsBrand(params).then( res => {
+                        if (res.data.code) {
+                            this.$message.error(res.data.msg || '新增商品品牌失败');
+                            return
+                        }
+                        this.$message.success(res.data.msg || '新增商品品牌成功');
+                        this.dialogVisible = false;
+                        this.getList();
+                    });
+                } else {
+                    params.id = this.branchAttr.id;
+                    updateGoodsBrandById(params).then(res=>{
+                        if (res.data.code) {
+                            this.$message.error(res.data.msg || '更新商品品牌失败');
+                            return
+                        }
+                        this.$message.success(res.data.msg || '更新商品品牌成功');
+                        this.dialogVisible = false;
+                        this.getList();
+                    });
+                }
+            } else {
+                console.log('error submit!!');
+                return false;
+            }
+            });
+        },
       handleSelectionChange(val) {
         this.multipleSelection = val;
       },
       handleUpdate(index, row) {
-        this.$router.push({path: '/pms/updateBrand', query: {id: row.id}})
+            this.dialogVisible = true;
+            this.editingCategroy = true;
+            this.dialogTitle = "编辑品牌名称";
+            this.branchAttr.name = row.brandName;
+            this.branchAttr.id = row.id;
+            this.branchAttr.type = row.type;
+        // this.$router.push({path: '/pms/updateBrand', query: {id: row.id}})
       },
       handleDelete(index, row) {
         this.$confirm('是否要删除该品牌', '提示', {
@@ -190,13 +278,13 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          deleteBrand(row.id).then(response => {
-            this.$message({
-              message: '删除成功',
-              type: 'success',
-              duration: 1000
-            });
-            this.getList();
+          deleteGoodsBrandById({id: row}).then(res => {
+                if (res.data.code) {
+                    this.$message.error(res.data.msg || '删除商品品牌失败');
+                    return
+                }
+                this.$message.success(res.data.msg || '删除商品品牌成功');
+                this.getList();
           });
         });
       },
@@ -296,7 +384,13 @@
         });
       },
       addBrand() {
-        this.$router.push({path: '/pms/addBrand'})
+            this.dialogVisible = true;
+            this.dialogTitle = "添加品牌";
+            this.editingCategroy = false;
+            this.branchAttr.name = '';
+            this.branchAttr.type = '';
+        // this.$router.push({path: '/pms/addBrand'})
+
       }
     }
   }

@@ -1,8 +1,11 @@
 <template>
   <div style="margin-top: 50px">
     <el-form :model="value" ref="productSaleForm" label-width="120px" style="width: 600px" size="small">
-      </el-form-item>
-      <el-form-item label="商品上架：">
+
+        <el-form-item label="商品相册：">
+            <multi-upload v-model="selectProductAttrPics"></multi-upload>
+        </el-form-item>
+      <!-- <el-form-item label="商品上架：">
         <el-switch
           v-model="value.publishStatus"
           :active-value="1"
@@ -30,7 +33,7 @@
           <el-checkbox :label="3">免费包邮</el-checkbox>
         </el-checkbox-group>
       </el-form-item> -->
-      <el-form-item label="建议醒酒时间和搭配菜肴：">
+      <!-- <el-form-item label="建议醒酒时间和搭配菜肴：">
         <el-input v-model="value.detailTitle"></el-input>
       </el-form-item>
       <el-form-item label="推荐理由：">
@@ -47,7 +50,7 @@
       </el-form-item>
       <el-form-item label="商品备注：">
         <el-input v-model="value.note" type="textarea" :autoSize="true"></el-input>
-      </el-form-item>
+      </el-form-item> -->
       <!-- <el-form-item label="选择优惠方式：">
         <el-radio-group v-model="value.promotionType" size="small">
           <el-radio-button :label="0">无优惠</el-radio-button>
@@ -67,7 +70,10 @@
 
 <script>
   import {fetchList as fetchMemberLevelList} from '@/api/memberLevel'
-
+  import MultiUpload from '@/components/Upload/multiUpload'
+   import {
+        addGoodsPhoto, updateGoodsPhotoById
+    } from '@/api/api';
   export default {
     name: "ProductSaleDetail",
     props: {
@@ -75,8 +81,12 @@
       isEdit: {
         type: Boolean,
         default: false
+      },
+      productId:{
+          type:String
       }
     },
+    components: {MultiUpload},
     data() {
       return {
         //日期选择器配置
@@ -84,22 +94,41 @@
           disabledDate(time) {
             return time.getTime() < Date.now();
           }
-        }
+        },
+        selectProductAttrPics: []
       }
     },
+    watch: {
+        value (newVal, oldVal) {
+            if (this.isEdit && this.value) {
+                console.log("商品图片信息：",this.value);
+                this.selectProductAttrPics.push(this.value.photo1);
+                this.selectProductAttrPics.push(this.value.photo2);
+                this.selectProductAttrPics.push(this.value.photo3);
+            }
+        }
+    },
     created() {
-      if (this.isEdit) {
-        // this.handleEditCreated();
-      } else {
-        fetchMemberLevelList({defaultStatus: 0}).then(response => {
-          let memberPriceList = [];
-          for (let i = 0; i < response.data.length; i++) {
-            let item = response.data[i];
-            memberPriceList.push({memberLevelId: item.id, memberLevelName: item.name})
-          }
-          this.value.memberPriceList = memberPriceList;
-        });
-      }
+    //   if (this.isEdit) {
+    //         if (this.value && this.value.photo1) {
+    //             console.log("商品图片信息：",this.value);
+    //             this.selectProductAttrPics.push(this.value.photo1);
+    //             this.selectProductAttrPics.push(this.value.photo2);
+    //             this.selectProductAttrPics.push(this.value.photo3);
+    //         }
+    //         console.log("商品图片信息：",this.selectProductAttrPics);
+           
+    //     // this.handleEditCreated();
+    //   } else {
+    //     // fetchMemberLevelList({defaultStatus: 0}).then(response => {
+    //     //   let memberPriceList = [];
+    //     //   for (let i = 0; i < response.data.length; i++) {
+    //     //     let item = response.data[i];
+    //     //     memberPriceList.push({memberLevelId: item.id, memberLevelName: item.name})
+    //     //   }
+    //     //   this.value.memberPriceList = memberPriceList;
+    //     // });
+    //   }
     },
     computed: {
       //选中的服务保证
@@ -127,6 +156,9 @@
             this.value.serviceIds = null;
           }
         }
+      },
+      editProductId () {
+          return this.$route.query.id;
       }
     },
     methods: {
@@ -195,7 +227,34 @@
         this.$emit('prevStep')
       },
       handleNext() {
-        this.$emit('nextStep')
+           let params = {};
+           this.selectProductAttrPics.forEach((v,index) => {
+              params[`photo${index+1}`] = v;
+          })
+          if (this.isEdit && this.value) {
+            //   更新的时候使用商品图片表的id
+             params.id = this.value.id;
+            updateGoodsPhotoById(params).then( res => {
+                if (res.data.code) {
+                    this.$message.error(res.data.msg || '新增商品基本信息失败');
+                    return
+                }
+                this.$message.success(res.data.msg || '新增商品基本信息成功');
+                this.$emit('nextStep')
+            });
+            return
+          };
+            params.goodsId = this.productId ? this.productId : this.editProductId;
+            //   console.log('参数',params);
+            addGoodsPhoto(params).then( res => {
+                if (res.data.code) {
+                    this.$message.error(res.data.msg || '新增商品基本信息失败');
+                    return
+                }
+                this.$message.success(res.data.msg || '新增商品基本信息成功');
+                this.$emit('nextStep')
+            });
+        
       }
     }
   }

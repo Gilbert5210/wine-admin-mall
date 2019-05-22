@@ -1,11 +1,11 @@
 <template>
   <div class="productAttrDeatail" style="margin-top: 50px">
-    <el-form :model="value" ref="productAttrForm" label-width="120px" style="width: 820px" size="small">
-      <el-form-item label="商品相册：">
+    <el-form :model="productDetailContent" ref="productAttrForm" label-width="120px" style="width: 820px" size="small">
+      <!-- <el-form-item label="商品相册：">
         <multi-upload v-model="selectProductAttrPics"></multi-upload>
-      </el-form-item>
-      <el-form-item label="规格参数：">
-		  <Tinymce class='editor' v-model='value.detailHtml' ></Tinymce>	
+      </el-form-item> -->
+      <el-form-item label="产品详情介绍：">
+		  <Tinymce class='editor' v-model='productDetailContent.goodsDetail' ></Tinymce>	
       </el-form-item>
       <el-form-item style="text-align: center">
         <el-button size="medium" @click="handlePrev">上一步，填写商品促销</el-button>
@@ -21,7 +21,9 @@
   import SingleUpload from '@/components/Upload/singleUpload'
   import MultiUpload from '@/components/Upload/multiUpload'
   import Tinymce from '@/components/wangEdit/index'
-
+    import {
+        addGoodsDetail, updateGoodsDetailById
+    } from '@/api/api';
   export default {
     name: "ProductAttrDetail",
     components: {SingleUpload, MultiUpload, Tinymce},
@@ -30,6 +32,9 @@
       isEdit: {
         type: Boolean,
         default: false
+      },
+      productIds: {
+          type: String
       }
     },
     data() {
@@ -47,10 +52,16 @@
         //可手动添加的商品属性
         addProductAttrValue: '',
         //商品富文本详情激活类型
-        activeHtmlName: 'pc'
+        activeHtmlName: 'pc',
+        productDetailContent: {
+            goodsDetail: ''
+        },
       }
     },
     computed: {
+        editProductId () {
+            return this.$route.query.id;
+        },
       //是否有商品属性图片
       hasAttrPic() {
         if (this.selectProductAttrPics.length < 1) {
@@ -99,15 +110,22 @@
       }
     },
     created() {
-      this.getProductAttrCateList();
+       
+    //   this.getProductAttrCateList();
     },
     watch: {
-      productId:function (newValue) {
-        if(!this.isEdit)return;
-        if(this.hasEditCreated)return;
-        if(newValue===undefined||newValue==null||newValue===0)return;
-        this.handleEditCreated();
-      }
+        value (newVal, oldVal) {
+            if (this.isEdit && this.value) {
+                console.log("商品图片信息：",this.value);
+                this.productDetailContent.goodsDetail = this.value.goodsDetail;    
+            }
+        }
+    //   productId:function (newValue) {
+    //     if(!this.isEdit)return;
+    //     if(this.hasEditCreated)return;
+    //     if(newValue===undefined||newValue==null||newValue===0)return;
+    //     this.handleEditCreated();
+    //   }
     },
     methods: {
       handleEditCreated() {
@@ -431,7 +449,27 @@
         this.$emit('nextStep')
       },
 		handleFinishCommit () {
-			this.$emit('finishCommit', this.isEdit);
+            this.productDetailContent.goodsId = this.productIds ? this.productIds : this.editProductId;
+            if (this.isEdit && this.value) {
+                updateGoodsDetailById(this.productDetailContent).then( res => {
+                    if (res.data.code) {
+                        this.$message.error(res.data.msg || '更新商品详情失败');
+                        return
+                    }
+                    this.$message.success(res.data.msg || '新增商品详情成功');
+                    this.$emit('finishCommit', this.isEdit);
+                });
+                return
+            }
+            addGoodsDetail(this.productDetailContent).then( res => {
+                if (res.data.code) {
+                    this.$message.error(res.data.msg || '新增商品详情失败');
+                    return
+                }
+                this.$message.success(res.data.msg || '新增商品详情成功');
+                this.$router.push('/pms');
+    			// this.$emit('finishCommit', this.isEdit);
+            });
 		}
     }
   }

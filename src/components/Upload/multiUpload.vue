@@ -14,8 +14,8 @@
     >
       <i class="el-icon-plus"></i>
     </el-upload>
-    <el-dialog :visible.sync="dialogVisible">
-      <img width="100%" :src="dialogImageUrl" alt="">
+    <el-dialog :visible.sync="dialogVisible" class="big-img">
+      <img :src="dialogImageUrl" alt="">
     </el-dialog>
   </div>
 </template>
@@ -131,8 +131,25 @@
     }
   }
 </script>
-<style>
-
+<style lang='scss'>
+.big-img {
+    text-align: center;
+    .el-dialog {
+        width: 550px;
+        height: 500px;
+        img {   
+            // width: 100%;
+            height: 100%;
+            width: 111px;
+            object-fit: contain
+            // max-height: 500px;
+            // width: 400px;
+        }
+    }
+}
+.el-upload-list__item-thumbnail {
+    object-fit: contain;
+}
 </style>
 
 

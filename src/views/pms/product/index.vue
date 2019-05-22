@@ -21,12 +21,12 @@
       <div style="margin-top: 15px">
         <el-form :inline="true" :model="listQuery" size="small" label-width="140px">
           <el-form-item label="输入搜索：">
-            <el-input style="width: 203px" v-model="listQuery.keyword" placeholder="商品名称"></el-input>
+            <el-input style="width: 203px" v-model="listQuery.keyword" placeholder="商品关键字"></el-input>
           </el-form-item>
           <!-- <el-form-item label="商品货号：">
             <el-input style="width: 203px" v-model="listQuery.productSn" placeholder="商品货号"></el-input>
           </el-form-item> -->
-          <el-form-item label="商品分类：">
+          <!-- <el-form-item label="商品分类：">
             <el-cascader
               clearable
               v-model="selectProductCateValue"
@@ -42,16 +42,16 @@
                 :value="item.value">
               </el-option>
             </el-select>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item label="上架状态：">
-            <el-select v-model="listQuery.publishStatus" placeholder="全部" clearable>
-              <el-option
-                v-for="item in publishStatusOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-              </el-option>
-            </el-select>
+              
+                <el-switch
+                    v-model="listQuery.isSale"
+                    active-color="#13ce66"
+                    :active-value="1"
+                    :inactive-value="0"
+                >
+                </el-switch>
           </el-form-item>
           <!-- <el-form-item label="审核状态：">
             <el-select v-model="listQuery.verifyStatus" placeholder="全部" clearable>
@@ -84,68 +84,61 @@
                 v-loading="listLoading"
                 border>
         <el-table-column type="selection" width="60" align="center"></el-table-column>
-        <el-table-column label="编号" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.id}}</template>
+        <el-table-column label="编号" type="index" width="60" align="center">
+            <!-- <template slot-scope="scope">{{scope.row.id}}</template> -->
         </el-table-column>
         <el-table-column label="商品图片" width="120" align="center">
-          <template slot-scope="scope"><img style="height: 80px" :src="scope.row.pic"></template>
+          <template slot-scope="scope"><img style="height: 80px" :src="scope.row.goods.goodsCover"></template>
         </el-table-column>
-        <el-table-column label="商品名称" align="center">
+        <el-table-column label="商品名称" width="150" align="center">
           <template slot-scope="scope">
-            <p>{{scope.row.name}}</p>
-            <p>品牌：{{scope.row.brandName}}</p>
+            <p>{{scope.row.goods.chineseName}}</p>
+            <p>{{scope.row.goods.englishName}}</p>
+          </template>
+        </el-table-column>
+        <el-table-column label="品牌" align="center">
+          <template slot-scope="scope">
+            <p>{{scope.row.goods.brand}}</p>
           </template>
         </el-table-column>
         <el-table-column label="商品类型" align="center">
           <template slot-scope="scope">
-            <!-- <p>{{scope.row.name}}</p> -->
-            <span>甜白</span>
+              {{scope.row.goods.category}}
           </template>
         </el-table-column>
         <el-table-column label="价格" width="120" align="center">
           <template slot-scope="scope">
-            <p>价格：￥{{scope.row.price}}</p>
-            <!-- <p>货号：{{scope.row.productSn}}</p> -->
+            <p>售价：￥{{scope.row.goods.discountPrice}}</p>
+            <p>原价：{{scope.row.goods.price}}</p>
           </template>
         </el-table-column>
         <el-table-column label="标签" width="140" align="center">
           <template slot-scope="scope">
-            <p>上架：
-              <el-switch
-                @change="handlePublishStatusChange(scope.$index, scope.row)"
-                :active-value="1"
-                :inactive-value="0"
-                v-model="scope.row.publishStatus">
-              </el-switch>
-            </p>
-            <p>新品：
-              <el-switch
-                @change="handleNewStatusChange(scope.$index, scope.row)"
-                :active-value="1"
-                :inactive-value="0"
-                v-model="scope.row.newStatus">
-              </el-switch>
-            </p>
-            <p>推荐：
-              <el-switch
-                @change="handleRecommendStatusChange(scope.$index, scope.row)"
-                :active-value="1"
-                :inactive-value="0"
-                v-model="scope.row.recommandStatus">
-              </el-switch>
-            </p>
+              <el-tag v-for="(item,index) in scope.row.goodsTagList" :key="index">{{item.tagName}}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="排序" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.sort}}</template>
-        </el-table-column>
+        <!-- <el-table-column label="排序" width="100" align="center">
+          <template slot-scope="scope">
+            <p>上架：
+                <el-switch
+                    @change="handlePublishStatusChange(scope.$index, scope.row)"
+                    :active-value="1"
+                    :inactive-value="0"
+                    v-model="scope.row.publishStatus">
+                </el-switch>
+            </p>
+          </template>
+        </el-table-column> -->
         <!-- <el-table-column label="SKU库存" width="100" align="center">
           <template slot-scope="scope">
             <el-button type="primary" icon="el-icon-edit" @click="handleShowSkuEditDialog(scope.$index, scope.row)" circle></el-button>
           </template>
         </el-table-column> -->
         <el-table-column label="销量" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.sale}}</template>
+          <template slot-scope="scope">{{scope.row.goods.saleNum}}</template>
+        </el-table-column>
+        <el-table-column label="库存" width="100" align="center">
+          <template slot-scope="scope">{{scope.row.goods.stockNum}}</template>
         </el-table-column>
         <!-- <el-table-column label="审核状态" width="100" align="center">
           <template slot-scope="scope">
@@ -158,29 +151,27 @@
             </p>
           </template>
         </el-table-column> -->
-        <el-table-column label="操作" width="160" align="center">
-          <template slot-scope="scope">
-            <p>
-              <el-button
-                size="mini"
-                @click="handleShowProduct(scope.$index, scope.row)">查看
-              </el-button>
-              <el-button
-                size="mini"
-                @click="handleUpdateProduct(scope.$index, scope.row)">编辑
-              </el-button>
-            </p>
-            <p>
+        <el-table-column label="操作" width="80" align="center">
+          <template slot-scope="scope"  >
               <!-- <el-button
                 size="mini"
-                @click="handleShowLog(scope.$index, scope.row)">日志
+                @click="handleShowProduct(scope.$index, scope.row)">查看
               </el-button> -->
-              <el-button
-                size="mini"
-                type="danger"
-                @click="handleDelete(scope.$index, scope.row)">删除
-              </el-button>
-            </p>
+                <p class="tools">
+                    <el-button
+                        size="mini"
+                        @click="handleUpdateProduct(scope.$index, scope.row)">编辑
+                    </el-button>
+                    <!-- <el-button
+                        size="mini"
+                        @click="handleShowLog(scope.$index, scope.row)">日志
+                    </el-button> -->
+                    <el-button
+                        size="mini"
+                        type="danger"
+                        @click="handleDelete(scope.$index, scope.row)">删除
+                    </el-button>
+                </p>
           </template>
         </el-table-column>
       </el-table>
@@ -289,16 +280,14 @@
   import {fetchList as fetchProductAttrList} from '@/api/productAttr'
   import {fetchList as fetchBrandList} from '@/api/brand'
   import {fetchListWithChildren} from '@/api/productCate'
-
+    import {
+        selectGoodsList
+    } from '@/api/api';
   const defaultListQuery = {
     keyword: null,
     pageNum: 1,
-    pageSize: 5,
-    publishStatus: null,
-    // verifyStatus: null,
-    // productSn: null,
-    productCategoryId: null,
-    brandId: null
+    pageSize: 10,
+    isSale: 1,
   };
   export default {
     name: "productList",
@@ -374,8 +363,8 @@
     },
     created() {
       this.getList();
-      this.getBrandList();
-      this.getProductCateList();
+    //   this.getBrandList();
+    //   this.getProductCateList();
     },
     watch: {
       selectProductCateValue: function (newValue) {
@@ -407,12 +396,16 @@
         }
       },
       getList() {
-        this.listLoading = true;
-        fetchList(this.listQuery).then(response => {
-          this.listLoading = false;
-          this.list = response.data.list;
-          this.total = response.data.total;
-        });
+            this.listLoading = true;
+            selectGoodsList(this.listQuery).then(response => {
+                if (response.data.data) {
+                    this.list = response.data.data.data;
+                    this.total = response.data.data.totalCount;
+                } else {
+                    this.$message.warning('这个关键字搜索不到商品,请换个关键字尝试下');
+                }
+                this.listLoading = false;
+            });
       },
       getBrandList() {
         fetchBrandList({pageNum: 1, pageSize: 100}).then(response => {
@@ -580,13 +573,14 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          let ids = [];
-          ids.push(row.id);
-          this.updateDeleteStatus(1,ids);
+        //   let ids = [];
+        //   ids.push(row.id);
+        //   this.updateDeleteStatus(1,ids);
+
         });
       },
       handleUpdateProduct(index,row){
-        this.$router.push({path:'/pms/updateProduct',query:{id:row.id}});
+        this.$router.push({path:'/pms/updateProduct',query:{id:row.goods.id}});
       },
       handleShowProduct(index,row){
         console.log("handleShowProduct",row);
@@ -649,6 +643,18 @@
     }
   }
 </script>
-<style></style>
+<style lang='scss'>
+.app-container {
+    .tools {
+        .el-button {
+            &+.el-button{
+                margin-top: 5px;
+                margin-left: 0px;
+            }
+        }
+    }
+}
+
+</style>
 
 
