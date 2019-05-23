@@ -62,6 +62,9 @@
     computed: {
         editproductId () {
             return this.$route.query.id;
+        },
+        userId () {
+            return JSON.parse(localStorage.getItem("userToken")).userId;
         }
     },
 	data() {
@@ -79,7 +82,11 @@
 	},
 	created(){
 	  if(this.isEdit){
-		selectGoodsById({id: this.editproductId}).then(res=>{
+          let params = {
+              goodsId: this.editproductId,
+              userId: this.userId
+          }
+		selectGoodsById(params).then(res=>{
             this.productParam = res.data.data;
 		});
       } else {

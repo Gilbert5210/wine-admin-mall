@@ -153,3 +153,37 @@ export const selectOrderList = params => {
     return axios.post(`/RedWineMallGit/order/selectOrderList`, params, config)
 };
  
+// 获取今日会员数
+export const getUserNum = params => {
+    return axios.post(`/RedWineMallGit/user/getUserNum`, params, config)
+};
+ /**
+  * 
+  * 
+  */
+// 获取所有文章总数，获取今日新增文章数
+export const getArticleNum = params => {
+    return axios.post(`/RedWineMallGit/article/getArticleNum`, params, config)
+};
+// 新增文章
+export const addArticle = params => {
+    return axios.post(`/RedWineMallGit/article/addArticle`, params, config)
+};
+// 根据Id删除文章
+export const deleteArticleById = params => {
+    return axios.post(`/RedWineMallGit/article/deleteArticleById`, params, config)
+};
+// 根据Id更新文章
+export const updateArticleById = params => {
+    return axios.post(`/RedWineMallGit/article/updateArticleById`, params, config)
+};
+// 查找符合条件的文章列表
+export const selectArticleByCondition = params => {
+    return axios.post(`/RedWineMallGit/article/selectArticleByCondition`, params, config)
+};
+
+
+// 查找符合条件的文章列表
+export const selectOrderById = params => {
+    return axios.post(`/RedWineMallGit/order/selectOrderById`, params, config)
+};

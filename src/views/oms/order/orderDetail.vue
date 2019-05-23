@@ -45,33 +45,33 @@
         <el-row>
           <el-col :span="4" class="table-cell-title">订单编号</el-col>
           <el-col :span="4" class="table-cell-title">发货单流水号</el-col>
-          <el-col :span="4" class="table-cell-title">用户账号</el-col>
+          <!-- <el-col :span="4" class="table-cell-title">用户账号</el-col> -->
           <el-col :span="4" class="table-cell-title">支付方式</el-col>
           <el-col :span="4" class="table-cell-title">订单来源</el-col>
           <el-col :span="4" class="table-cell-title">订单类型</el-col>
+          <el-col :span="4" class="table-cell-title">配送方式</el-col>
         </el-row>
         <el-row>
-          <el-col :span="4" class="table-cell">{{order.orderSn}}</el-col>
+          <el-col :span="4" class="table-cell">{{order.id}}</el-col>
           <el-col :span="4" class="table-cell">暂无</el-col>
-          <el-col :span="4" class="table-cell">{{order.memberUsername}}</el-col>
+          <!-- <el-col :span="4" class="table-cell">{{order.memberUsername}}</el-col> -->
           <el-col :span="4" class="table-cell">{{order.payType | formatPayType}}</el-col>
           <el-col :span="4" class="table-cell">{{order.sourceType | formatSourceType}}</el-col>
           <el-col :span="4" class="table-cell">{{order.orderType | formatOrderType}}</el-col>
+          <el-col :span="4" class="table-cell">{{order.deliveryCompany | formatNull}}</el-col>
         </el-row>
         <el-row>
-          <el-col :span="4" class="table-cell-title">配送方式</el-col>
           <el-col :span="4" class="table-cell-title">物流单号</el-col>
-          <el-col :span="4" class="table-cell-title">自动确认收货时间</el-col>
-          <el-col :span="4" class="table-cell-title">订单可得优币</el-col>
-          <el-col :span="4" class="table-cell-title">订单可得成长值</el-col>
+          <!-- <el-col :span="4" class="table-cell-title">自动确认收货时间</el-col> -->
+          <!-- <el-col :span="4" class="table-cell-title">订单可得优币</el-col> -->
+          <!-- <el-col :span="4" class="table-cell-title">订单可得成长值</el-col> -->
           <el-col :span="4" class="table-cell-title">活动信息</el-col>
         </el-row>
         <el-row>
-          <el-col :span="4" class="table-cell">{{order.deliveryCompany | formatNull}}</el-col>
-          <el-col :span="4" class="table-cell">{{order.deliverySn | formatNull}}</el-col>
-          <el-col :span="4" class="table-cell">{{order.autoConfirmDay}}天</el-col>
-          <el-col :span="4" class="table-cell">{{order.integration}}</el-col>
-          <el-col :span="4" class="table-cell">{{order.growth}}</el-col>
+          <el-col :span="4" class="table-cell">{{order.orderNo | formatNull}}</el-col>
+          <!-- <el-col :span="4" class="table-cell">{{order.autoConfirmDay}}天</el-col> -->
+          <!-- <el-col :span="4" class="table-cell">{{order.integration}}</el-col> -->
+          <!-- <el-col :span="4" class="table-cell">{{order.growth}}</el-col> -->
           <el-col :span="4" class="table-cell">
             <el-popover
               placement="top-start"
@@ -92,14 +92,14 @@
         <el-row>
           <el-col :span="6" class="table-cell-title">收货人</el-col>
           <el-col :span="6" class="table-cell-title">手机号码</el-col>
-          <el-col :span="6" class="table-cell-title">邮政编码</el-col>
+          <!-- <el-col :span="6" class="table-cell-title">邮政编码</el-col> -->
           <el-col :span="6" class="table-cell-title">收货地址</el-col>
         </el-row>
         <el-row>
-          <el-col :span="6" class="table-cell">{{order.receiverName}}</el-col>
-          <el-col :span="6" class="table-cell">{{order.receiverPhone}}</el-col>
-          <el-col :span="6" class="table-cell">{{order.receiverPostCode}}</el-col>
-          <el-col :span="6" class="table-cell">{{order | formatAddress}}</el-col>
+          <el-col :span="6" class="table-cell">{{order.name}}</el-col>
+          <el-col :span="6" class="table-cell">{{order.phone}}</el-col>
+          <!-- <el-col :span="6" class="table-cell">{{order.receiverPostCode}}</el-col> -->
+          <el-col :span="6" class="table-cell">{{order.address}}</el-col>
         </el-row>
       </div>
       <div style="margin-top: 20px">
@@ -108,23 +108,23 @@
       </div>
       <el-table
         ref="orderItemTable"
-        :data="order.orderItemList"
+        :data="shoppingCartList"
         style="width: 100%;margin-top: 20px" border>
         <el-table-column label="商品图片" width="120" align="center">
           <template slot-scope="scope">
-            <img :src="scope.row.productPic" style="height: 80px">
+            <img :src="scope.row.goodsCover" style="height: 80px">
           </template>
         </el-table-column>
         <el-table-column label="商品名称" align="center">
           <template slot-scope="scope">
-            <p>{{scope.row.productName}}</p>
-            <p>品牌：{{scope.row.productBrand}}</p>
+            <p>{{scope.row.goodsName}}</p>
+            <!-- <p>品牌：{{scope.row.productBrand}}</p> -->
           </template>
         </el-table-column>
         <el-table-column label="价格/货号" width="120" align="center">
           <template slot-scope="scope">
-            <p>价格：￥{{scope.row.productPrice}}</p>
-            <p>货号：{{scope.row.productSn}}</p>
+            <p>价格：￥{{scope.row.discountPrice}}</p>
+            <!-- <p>货号：{{scope.row.productSn}}</p> -->
           </template>
         </el-table-column>
         <el-table-column label="属性" width="120" align="center">
@@ -134,12 +134,12 @@
         </el-table-column>
         <el-table-column label="数量" width="120" align="center">
           <template slot-scope="scope">
-            {{scope.row.productQuantity}}
+            {{scope.row.quantity}}
           </template>
         </el-table-column>
         <el-table-column label="小计" width="120" align="center">
           <template slot-scope="scope">
-            ￥{{scope.row.productPrice*scope.row.productQuantity}}
+            ￥{{scope.row.amountOfMoney}}
           </template>
         </el-table-column>
       </el-table>
@@ -155,29 +155,31 @@
           <el-col :span="6" class="table-cell-title">商品合计</el-col>
           <el-col :span="6" class="table-cell-title">运费</el-col>
           <el-col :span="6" class="table-cell-title">优惠券</el-col>
-          <el-col :span="6" class="table-cell-title">积分抵扣</el-col>
+          <el-col :span="6" class="table-cell-title">订单总金额</el-col>
+          <!-- <el-col :span="6" class="table-cell-title">积分抵扣</el-col> -->
         </el-row>
         <el-row>
           <el-col :span="6" class="table-cell">￥{{order.totalAmount}}</el-col>
-          <el-col :span="6" class="table-cell">￥{{order.freightAmount}}</el-col>
-          <el-col :span="6" class="table-cell">-￥{{order.couponAmount}}</el-col>
-          <el-col :span="6" class="table-cell">-￥{{order.integrationAmount}}</el-col>
+          <el-col :span="6" class="table-cell">￥{{order.freightAmount || 0 }}</el-col>
+          <el-col :span="6" class="table-cell">-￥{{order.couponAmount || 0}}</el-col>
+          <el-col :span="6" class="table-cell">-￥{{order.totalAmount || 0}}</el-col>
+          <!-- <el-col :span="6" class="table-cell">-￥{{order.integrationAmount}}</el-col> -->
         </el-row>
         <el-row>
-          <el-col :span="6" class="table-cell-title">活动优惠</el-col>
-          <el-col :span="6" class="table-cell-title">折扣金额</el-col>
-          <el-col :span="6" class="table-cell-title">订单总金额</el-col>
-          <el-col :span="6" class="table-cell-title">应付款金额</el-col>
+          <!-- <el-col :span="6" class="table-cell-title">活动优惠</el-col>
+          <!-- <el-col :span="6" class="table-cell-title">折扣金额</el-col> -->
+          <!-- <el-col :span="6" class="table-cell-title">订单总金额</el-col> -->
+          <!-- <el-col :span="6" class="table-cell-title">应付款金额</el-col> -->
         </el-row>
         <el-row>
-          <el-col :span="6" class="table-cell">-￥{{order.promotionAmount}}</el-col>
-          <el-col :span="6" class="table-cell">-￥{{order.discountAmount}}</el-col>
-          <el-col :span="6" class="table-cell">
+          <!-- <el-col :span="6" class="table-cell">-￥{{order.promotionAmount}}</el-col> -->
+          <!-- <el-col :span="6" class="table-cell">-￥{{order.discountAmount}}</el-col> -->
+          <!-- <el-col :span="6" class="table-cell">
             <span class="color-danger">￥{{order.totalAmount+order.freightAmount}}</span>
           </el-col>
           <el-col :span="6" class="table-cell">
-            <span class="color-danger">￥{{order.payAmount+order.freightAmount-order.discountAmount}}</span>
-          </el-col>
+            <span class="color-danger">￥{{order.payAmount+order.freightAmount}}</span>
+          </el-col> -->
         </el-row>
       </div>
       <div style="margin-top: 20px">
@@ -348,6 +350,7 @@
 </template>
 <script>
   import {getOrderDetail,updateReceiverInfo,updateMoneyInfo,closeOrder,updateOrderNote,deleteOrder} from '@/api/order';
+  import {selectOrderById} from '@/api/api';
   import LogisticsDialog from '@/views/oms/order/components/logisticsDialog';
   import {formatDate} from '@/utils/date';
   import VDistpicker from 'v-distpicker';
@@ -379,13 +382,19 @@
         closeInfo:{note:null,id:null},
         markOrderDialogVisible:false,
         markInfo:{note:null},
-        logisticsDialogVisible:false
+        logisticsDialogVisible:false,
+        shoppingCartList: []
       }
     },
+    computed: {
+        orderId () {
+            return  this.$route.query.id;
+        }
+    },
     created() {
-      this.id = this.list = this.$route.query.id;
-      getOrderDetail(this.id).then(response => {
-        this.order = response.data;
+      selectOrderById({id: this.orderId}).then(res => {
+            this.order = res.data.data.order;
+            this.shoppingCartList = res.data.data.shoppingCartList
       });
     },
     filters: {
@@ -437,6 +446,7 @@
         str += "  " + order.receiverDetailAddress;
         return str;
       },
+    //    0:代付款 1:待发货 2:已发货 3:已完成
       formatStatus(value) {
         if (value === 1) {
           return '待发货';

@@ -245,6 +245,7 @@
              if (this.isEdit && this.value) {
                 console.log("商品基本信息：", this.value);
                 this.productInfo = this.value.goods;
+                this.goodsCover = this.productInfo.goodsCover;
                 this.value.goodsTagList.forEach( v=> {
                     this.tagIdList.push(v.id);
                 })

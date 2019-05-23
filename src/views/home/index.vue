@@ -153,13 +153,13 @@
             <div class="layout-title">文章总览</div>
             <div style="padding: 40px">
               <el-row>
-                <el-col :span="6" class="color-danger overview-item-value">100</el-col>
+                <el-col :span="6" class="color-danger overview-item-value">{{articleTotals.todayCount}}</el-col>
                 <!-- <el-col :span="6" class="color-danger overview-item-value">400</el-col> -->
                 <!-- <el-col :span="6" class="color-danger overview-item-value">50</el-col> -->
-                <el-col :span="6" class="color-danger overview-item-value">500</el-col>
+                <el-col :span="6" class="color-danger overview-item-value">{{articleTotals.totalCount}}</el-col>
               </el-row>
               <el-row class="font-medium">
-                <el-col :span="6" class="overview-item-title">最新的文章</el-col>
+                <el-col :span="6" class="overview-item-title">今日新增</el-col>
                 <!-- <el-col :span="6" class="overview-item-title">已上架</el-col> -->
                 <!-- <el-col :span="6" class="overview-item-title">库存紧张</el-col> -->
                 <el-col :span="6" class="overview-item-title">全部文章</el-col>
@@ -172,15 +172,15 @@
             <div class="layout-title">用户总览</div>
             <div style="padding: 40px">
               <el-row>
-                <el-col :span="6" class="color-danger overview-item-value">100</el-col>
-                <el-col :span="6" class="color-danger overview-item-value">200</el-col>
-                <el-col :span="6" class="color-danger overview-item-value">1000</el-col>
-                <el-col :span="6" class="color-danger overview-item-value">5000</el-col>
+                <el-col :span="6" class="color-danger overview-item-value">{{userTotals.todayCount}}</el-col>
+                <!-- <el-col :span="6" class="color-danger overview-item-value">200</el-col>
+                <el-col :span="6" class="color-danger overview-item-value">1000</el-col> -->
+                <el-col :span="6" class="color-danger overview-item-value">{{userTotals.totalCount}}</el-col>
               </el-row>
               <el-row class="font-medium">
                 <el-col :span="6" class="overview-item-title">今日新增</el-col>
-                <el-col :span="6" class="overview-item-title">昨日新增</el-col>
-                <el-col :span="6" class="overview-item-title">本月新增</el-col>
+                <!-- <el-col :span="6" class="overview-item-title">昨日新增</el-col>
+                <el-col :span="6" class="overview-item-title">本月新增</el-col> -->
                 <el-col :span="6" class="overview-item-title">会员总数</el-col>
               </el-row>
             </div>
@@ -260,7 +260,8 @@
 <script>
   import {str2Date} from '@/utils/date';
     import {
-        getGoodsData, getOrderData 
+        getGoodsData, getOrderData,
+        getUserNum, getArticleNum
     } from '@/api/api';
   const DATA_FROM_BACKEND = {
     columns: ['date', 'orderCount','orderAmount'],
@@ -325,13 +326,16 @@
         dataEmpty: false,
         goodsTotalLists: {},
         orderTotaLists: {},
+        userTotals: '',
+        articleTotals: ''
       }
     },
     created(){
-      this.initOrderCountDate();
-      this.getData();
+    //   this.initOrderCountDate();
+    //   this.getData();
       this.getGoodsDataList();
       this.getOrderDataList();
+      this.getUserNumFun();
     },
     methods:{
       handleDateChange(){
@@ -373,6 +377,16 @@
       getOrderDataList () {
            getOrderData().then( res => {
               this.orderTotaLists = res.data.data;
+          })
+      },
+      getUserNumFun () {
+           getUserNum().then( res => {
+              this.userTotals = res.data.data;
+          })
+      },
+      getUserNumFun () {
+           getArticleNum().then( res => {
+              this.articleTotals = res.data.data;
           })
       }
     }

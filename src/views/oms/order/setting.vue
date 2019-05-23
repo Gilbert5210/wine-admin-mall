@@ -78,7 +78,7 @@
       }
     },
     created(){
-      this.getDetail();
+    //   this.getDetail();
     },
     methods:{
       confirm(formName){

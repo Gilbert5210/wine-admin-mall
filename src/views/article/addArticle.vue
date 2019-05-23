@@ -1,11 +1,22 @@
 <template>
     <div class="articleContent">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-            <el-form-item label="文章标题" prop="titleText">
-                <el-input v-model="ruleForm.titleText"></el-input>
+            <el-form-item label="文章标题" prop="title">
+                <el-input v-model="ruleForm.title"></el-input>
             </el-form-item>
-            <el-form-item prop="content">
-                <my-edit ref="myEdit" v-model="ruleForm.content"></my-edit>
+            <el-form-item label="文章关键字" prop="keyword">
+                <el-input v-model="ruleForm.keyword"></el-input>
+            </el-form-item>
+            <!-- <el-form-item label="文章简介" prop="desc">
+                <el-input 
+                    type="textarea"
+                    :rows="2"
+                    :autosize="{ minRows: 2, maxRows: 5}"
+                    placeholder="请输入简介"
+                    v-model="ruleForm.desc"></el-input>
+            </el-form-item> -->
+            <el-form-item prop="title">
+                <my-edit ref="myEdit" v-model="ruleForm.text"></my-edit>
             </el-form-item>
             <el-form-item label="文章封面" class="uploadCoverPath">
                 <el-upload
@@ -16,7 +27,7 @@
                     :on-change="getFile"
                     :show-file-list="false"
                     :before-upload="beforeAvatarUpload">
-                    <img v-if="ruleForm.imageUrl" :src="ruleForm.imageUrl" class="avatar">
+                    <img v-if="ruleForm.articleCoverPath" :src="ruleForm.articleCoverPath" class="avatar">
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
             </el-form-item>
@@ -58,7 +69,7 @@
                 <el-switch
                     :active-value="1"
                     :inactive-value="0"
-                    v-model="ruleForm.recommendFlag" />
+                    v-model="ruleForm.isRecommend" />
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="submitForm('ruleForm')">立即发布</el-button>
@@ -74,27 +85,32 @@
 
 <script>
     import myEdit from '@/components/wangEdit/index'
-    // import {    
-    //     selectAllArticleTag, 
-    //     selectAllArticleCategory,
-    //     addArticle
-    // } from '../../api/api.js'
+    import {    
+        selectAllArticleTag, 
+        updateArticleById,
+        addArticle
+    } from '../../api/api.js'
     export default {
         name: "sendBlog.vue",
+        components:{
+            myEdit
+        },
         data(){
             return{
                 editor:'',
                 dialogVisible: false,
                 dialogImageUrl: '',
                 ruleForm:{
-                    titleText: '',  //文章标题
-                    content: '',    //文章内容
+                    title: '',  //文章标题
+                    // desc: '',       //文章简介
+                    text: '',    //文章内容
                     labelList: [],//标签列表
                     // classList: [],//分类选择
-                    recommendFlag: 0,   //推荐
+                    isRecommend: 0,   //推荐
                     // commentPermission:'',
                     // visiblePermission:[],
-                    imageUrl: ''
+                    articleCoverPath: '',
+                    keyword: ''
                 },
                 articleCategoryLists:[
                     
@@ -103,38 +119,42 @@
                    
                 ],//默认列表
                 rules: {
-                    titleText: [
-                        { required: true, message: '请输入博客文章的标题', trigger: 'blur' }
+                    title: [
+                        { required: true, message: '请输入文章的标题', trigger: 'blur' }
                     ],
-                    content: [
-                        { required: true, message: '请输入博客文章的内容', trigger: 'blur' }
+                    text: [
+                        { required: true, message: '请输入文章的内容', trigger: 'blur' }
                     ],
                     labelList: [
                         { required: true, message: '请选标签', trigger: 'change' }
                     ],
-                    classList: [
-                        { required: true, message: '请选择分类', trigger: 'change' }
-                    ],
+                    // classList: [
+                    //     { required: true, message: '请选择分类', trigger: 'change' }
+                    // ],
                 }
             }
         },
         computed: {
             token () {
-                return JSON.parse(localStorage.getItem("userInfo")).token;
+                return JSON.parse(localStorage.getItem("userToken")).token;
             },
             userId () {
-                return JSON.parse(localStorage.getItem("userInfo")).userId;
+                return JSON.parse(localStorage.getItem("userToken")).userId;
+            },
+            isEdit () {
+                return this.$route.params.isEdit;
+            },
+            editArticleDetail () {
+                return this.$route.params.editArticleList;
             }
         },
-        components:{
-            myEdit
-        },
+        
         methods:{
             //选择器选中的时候触发的事件
             handleSelect(item){
                 console.log("选中的：",item);
             },
-            //立即发布博文的点击事件
+             //立即发布博文的点击事件
             submitForm (formData) {
                 let _this = this;
                  this.$refs[formData].validate((valid) => {
@@ -142,34 +162,45 @@
                         // console.log(_this.ruleForm,'form数据');
                         let params = {
                             article: {
-                                userId: _this.userId,         //用户Id
-                                authorId: _this.userId,       //作者Id，新增博文时和用户Id一致
-                                title: _this.ruleForm.titleText,          //标题
-                                articleCoverPath: _this.ruleForm.imageUrl,   //文章封面路径(非必填)
-                                text: _this.ruleForm.content,
+                                title: _this.ruleForm.title,          //标题
+                                articleCoverPath: _this.ruleForm.articleCoverPath,   //文章封面路径(非必填)
+                                text: _this.ruleForm.text,
+                                isRecommend: _this.ruleForm.isRecommend,
+                                keyword: _this.ruleForm.keyword
                             },
-                            categoryIdList: _this.ruleForm.classList, //分类Id数组
                             tagIdList: _this.ruleForm.labelList       //标签Id数组
                         };
-                        let config = {
-                            headers:{
-                                token: _this.token,
-                                userId: _this.userId
-                            }
-                        };
-                        addArticle(params, config).then(res => {
-                            if (res.data.code === 0) {
-                                this.$message({
-                                    type: "success",
-                                    message: '博客发送成功'
-                                });
-                                this.$router.push({
-                                    path:'userInfo/personalCenter'
-                                })
-                            } else {
-                                this.$message.error(res.data.msg);
-                            }
-                        })
+                        if (_this.isEdit) {
+                            params.article['id'] = _this.editArticleDetail.article.id;
+                            updateArticleById(params).then(res => {
+                                if (res.data.code === 0) {
+                                    this.$message({
+                                        type: "success",
+                                        message: '博客更新成功'
+                                    });
+                                    this.$router.push({
+                                        path:'/article/articleList'
+                                    })
+                                } else {
+                                    this.$message.error(res.data.msg);
+                                }
+                            });
+                        } else {
+                            params.article['userId'] = _this.userId;
+                            addArticle(params).then(res => {
+                                if (res.data.code === 0) {
+                                    this.$message({
+                                        type: "success",
+                                        message: '成功新增文章'
+                                    });
+                                    this.$router.push({
+                                        path:'/article/articleList'
+                                    })
+                                } else {
+                                    this.$message.error(res.data.msg);
+                                }
+                            })
+                        }
                     }
                     else {
                         this.$message({
@@ -183,9 +214,15 @@
             resetForm(ruleForm){
                
             },
+            // 获取文章标签列表
+            getArticleTagList() {
+                selectAllArticleTag().then(response => {
+                    this.articleTagList = response.data.data;
+                });
+            },
             getFile (res,file) {
                 this.getBase64(res.raw).then( res => {
-                    this.ruleForm.imageUrl = res;
+                    this.ruleForm.articleCoverPath= res;
                 });
             },
             // 把图片地址转换成base64位
@@ -228,37 +265,11 @@
             },
             // 查询博客全部标签
             selectArticleTag () {
-                let params = {
-                };
-                let header = {
-                    headers:{
-                        token: this.token,
-                        userId: this.userId
-                    }
-                }
-                selectAllArticleTag(params,header).then(res => {
+                selectAllArticleTag().then(res => {
                     if (res.data.code === 0) {
                         this.articleTagLists = res.data.data;
                     } else {
                         this.$message.error("博客标签列表请求失败");
-                    }
-                })
-            },
-            // 查询博客全部分类
-            selectArticleCategory () {
-                let params = {
-                };
-                let header = {
-                    headers:{
-                        token: this.token,
-                        userId: this.userId
-                    }
-                }
-                selectAllArticleCategory(params,header).then(res => {
-                    if (res.data.code === 0) {
-                        this.articleCategoryLists = res.data.data;
-                    } else {
-                        this.$message.error("博客分类列表请求失败");
                     }
                 })
             },
@@ -278,7 +289,13 @@
         },
         mounted () {
             // this.selectArticleCategory();
-            // this.selectArticleTag();
+            this.selectArticleTag();
+            if (this.isEdit) {
+                this.ruleForm = this.editArticleDetail.article;
+                this.ruleForm.labelList = this.editArticleDetail.articleTagList.map( v => {
+                    return v.id
+                })
+            }
             // console.log(this.$refs['myEdit'].editor.txt.html() ,'获取富文本编辑器HTML');
         }
     }

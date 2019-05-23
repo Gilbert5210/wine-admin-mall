@@ -26,7 +26,7 @@
           <el-form-item label="收货人：">
             <el-input v-model="listQuery.receiverKeyword" class="input-width" placeholder="收货人姓名/手机号码"></el-input>
           </el-form-item>
-          <el-form-item label="提交时间：">
+          <!-- <el-form-item label="提交时间：">
             <el-date-picker
               class="input-width"
               v-model="listQuery.createTime"
@@ -34,7 +34,7 @@
               type="date"
               placeholder="请选择时间">
             </el-date-picker>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item label="订单状态：">
             <el-select v-model="listQuery.status" class="input-width" placeholder="全部" clearable>
               <el-option v-for="item in statusOptions"
@@ -44,7 +44,7 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="订单分类：">
+          <!-- <el-form-item label="订单分类：">
             <el-select v-model="listQuery.orderType" class="input-width" placeholder="全部" clearable>
               <el-option v-for="item in orderTypeOptions"
                          :key="item.value"
@@ -52,7 +52,7 @@
                          :value="item.value">
               </el-option>
             </el-select>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item label="订单来源：">
             <el-select v-model="listQuery.sourceType" class="input-width" placeholder="全部" clearable>
               <el-option v-for="item in sourceTypeOptions"
@@ -179,6 +179,8 @@
   import LogisticsDialog from '@/views/oms/order/components/logisticsDialog';
   const defaultListQuery = {
     // userId: "",  //用户id
+    pageSize: 10,
+    pageNum: 1,
     statusList: [0,1,2],  //订单状态数组 0:代付款 1:待发货 2:已发货 3:已完成
     // name: ""  //用户名
   };
@@ -305,7 +307,7 @@
         this.multipleSelection = val;
       },
       handleViewOrder(index, row){
-        this.$router.push({path:'/oms/orderDetail',query:{id:row.id}})
+        this.$router.push({path:'/oms/orderDetail',query:{id: row.order.id}})
       },
       handleCloseOrder(index, row){
         this.closeOrder.dialogVisible=true;
@@ -400,12 +402,14 @@
       getList() {
             this.listLoading = true;
             let params = {
-                statusList: [0,1 ,2 , 3]
+                statusList: [0,1,2,3],
+                pageSize:10,
+                pageNum:1
             }
-            selectOrderList(params).then(response => {
+            selectOrderList(this.listQuery).then(response => {
                 this.listLoading = false;
-                this.list = response.data.data;
-                this.total = response.data.data.length;
+                this.list = response.data.data.data;
+                this.total = response.data.data.totalCount;
             });
       },
       deleteOrder(ids){

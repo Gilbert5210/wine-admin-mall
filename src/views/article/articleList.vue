@@ -84,28 +84,33 @@
                 v-loading="listLoading"
                 border>
         <el-table-column type="selection" width="60" align="center"></el-table-column>
-        <el-table-column label="编号" width="80" align="center">
-          <template slot-scope="scope">{{scope.row.id}}</template>
+        <el-table-column label="编号" type="index" width="40" align="center">
+          <!-- <template slot-scope="scope">{{scope.row.id}}</template> -->
         </el-table-column>
         <el-table-column label="文章封面图片" width="120" align="center">
-          <template slot-scope="scope"><img style="height: 80px" :src="scope.row.pic"></template>
+            <template slot-scope="scope">
+                <img style="height: 80px" :src="scope.row.article.articleCoverPath">
+            </template>
         </el-table-column>
         <el-table-column label="文章标题" align="center">
           <template slot-scope="scope">
-            <p>{{scope.row.name}}</p>
-            <p>简介：{{scope.row.brandName}}</p>
+            <p>{{scope.row.article.title}}</p>
+            <!-- <p>简介：{{scope.row.brandName}}</p> -->
           </template>
         </el-table-column>
         <el-table-column label="阅读量" width="120" align="center">
           <template slot-scope="scope">
-            <p>{{scope.row.price}}</p>
+            <p>{{scope.row.articleDetail.readNum}}</p>
             <!-- <p>货号：{{scope.row.productSn}}</p> -->
           </template>
         </el-table-column>
         <el-table-column label="标签" width="208" align="center">
           <template slot-scope="scope">
-              <el-tag>标签一</el-tag>
-              <el-tag>标签二</el-tag>
+            <el-tag 
+                class="tag"
+                v-for="(item, index) in scope.row.articleTagList" 
+                :key="index">{{item.tagName}}
+            </el-tag>
             <!-- <p>上架：
               <el-switch
                 @change="handlePublishStatusChange(scope.$index, scope.row)"
@@ -132,11 +137,11 @@
             </p> -->
           </template>
         </el-table-column>
-        <el-table-column label="排序" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.sort}}</template>
+        <el-table-column label="点赞数量" width="100" align="center">
+            <template slot-scope="scope">{{scope.row.articleDetail.likeNum}}</template>
         </el-table-column>
-        <el-table-column label="推荐" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.sort}}</template>
+        <el-table-column label="被收藏数" width="100" align="center">
+          <template slot-scope="scope">{{scope.row.articleDetail.collectionNum}}</template>
         </el-table-column>
         <!-- <el-table-column label="SKU库存" width="100" align="center">
           <template slot-scope="scope">
@@ -175,7 +180,7 @@
               <el-button
                 size="mini"
                 type="danger"
-                @click="handleDelete(scope.$index, scope.row)">删除
+                @click="handleDelete(scope.$index, scope.row.articleDetail.articleId)">删除
               </el-button>
             </p>
           </template>
@@ -286,16 +291,16 @@
   import {fetchList as fetchProductAttrList} from '@/api/productAttr'
   import {fetchList as fetchBrandList} from '@/api/brand'
   import {fetchListWithChildren} from '@/api/productCate'
-
+    import {selectArticleByCondition, 
+        deleteArticleById
+    } from '@/api/api'
   const defaultListQuery = {
     keyword: null,
     pageNum: 1,
-    pageSize: 5,
-    publishStatus: null,
-    // verifyStatus: null,
-    // productSn: null,
-    productCategoryId: null,
-    brandId: null
+    pageSize: 10,
+    tagIdList:[],
+    dateSort: null,
+    readSort: null,
   };
   export default {
     name: "productList",
@@ -371,18 +376,23 @@
     },
     created() {
       this.getList();
-      this.getBrandList();
-      this.getProductCateList();
+    //   this.getBrandList();
+    //   this.getProductCateList();
+    },
+    computed: {
+        userId () {
+            return JSON.parse(localStorage.getItem("userToken")).userId;
+        }
     },
     watch: {
-      selectProductCateValue: function (newValue) {
-        if (newValue != null && newValue.length == 2) {
-          this.listQuery.productCategoryId = newValue[1];
-        } else {
-          this.listQuery.productCategoryId = null;
-        }
+    //   selectProductCateValue: function (newValue) {
+    //     if (newValue != null && newValue.length == 2) {
+    //       this.listQuery.productCategoryId = newValue[1];
+    //     } else {
+    //       this.listQuery.productCategoryId = null;
+    //     }
 
-      }
+    //   }
     },
     filters: {
       verifyStatusFilter(value) {
@@ -403,13 +413,15 @@
           return row.sp3;
         }
       },
+    //   h获取文章列表
       getList() {
-        this.listLoading = true;
-        fetchList(this.listQuery).then(response => {
-          this.listLoading = false;
-          this.list = response.data.list;
-          this.total = response.data.total;
-        });
+            this.listLoading = true;
+            this.listQuery.userId = this. userId;
+            selectArticleByCondition(this.listQuery).then(response => {
+                this.listLoading = false;
+                this.list = response.data.data.data;
+                this.total = response.data.data.totalCount;
+            });
       },
       getBrandList() {
         fetchBrandList({pageNum: 1, pageSize: 100}).then(response => {
@@ -577,15 +589,30 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          let ids = [];
-          ids.push(row.id);
-          this.updateDeleteStatus(1,ids);
+             deleteArticleById({id: row}).then(res => {
+                 if (res.data.code) {
+                    this.$message.error(res.data.msg || '文章删除失败');     
+                 }
+                this.$message.success(res.data.msg || '文章删除成功');
+                this.getList();
+            });
+        //   let ids = [];
+        //   ids.push(row.id);
+        //   this.updateDeleteStatus(1,ids);
         });
       },
       handleUpdateProduct(index,row){
-        this.$router.push({path:'/article/addArticle',query:{id:row.id}});
+        this.$router.push({
+            path:'/article/addArticle',
+            name: 'addArticle',
+            params: {
+                isEdit: true,
+                editArticleList: row
+            }
+            // query:{id:row.id}});
+        });
       },
-      handleShowProduct(index,row){
+      handleShowProduct(index,row) {
         console.log("handleShowProduct",row);
       },
       handleShowVerifyDetail(index,row){
@@ -646,6 +673,12 @@
     }
   }
 </script>
-<style></style>
+<style lang='scss'>
+.table-container {
+    .tag {
+        margin: 0 5px
+    }
+}
+</style>
 
 
