@@ -7,14 +7,14 @@
             <el-form-item label="文章关键字" prop="keyword">
                 <el-input v-model="ruleForm.keyword"></el-input>
             </el-form-item>
-            <!-- <el-form-item label="文章简介" prop="desc">
+            <el-form-item label="文章简介" prop="desc">
                 <el-input 
                     type="textarea"
                     :rows="2"
                     :autosize="{ minRows: 2, maxRows: 5}"
                     placeholder="请输入简介"
                     v-model="ruleForm.desc"></el-input>
-            </el-form-item> -->
+            </el-form-item>
             <el-form-item prop="title">
                 <my-edit ref="myEdit" v-model="ruleForm.text"></my-edit>
             </el-form-item>
@@ -102,7 +102,7 @@
                 dialogImageUrl: '',
                 ruleForm:{
                     title: '',  //文章标题
-                    // desc: '',       //文章简介
+                    desc: '',       //文章简介
                     text: '',    //文章内容
                     labelList: [],//标签列表
                     // classList: [],//分类选择
@@ -165,6 +165,7 @@
                                 title: _this.ruleForm.title,          //标题
                                 articleCoverPath: _this.ruleForm.articleCoverPath,   //文章封面路径(非必填)
                                 text: _this.ruleForm.text,
+                                desc: _this.ruleForm.desc,
                                 isRecommend: _this.ruleForm.isRecommend,
                                 keyword: _this.ruleForm.keyword
                             },

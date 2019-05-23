@@ -336,6 +336,7 @@
       this.getGoodsDataList();
       this.getOrderDataList();
       this.getUserNumFun();
+      this.getArticleNumFun();
     },
     methods:{
       handleDateChange(){
@@ -384,7 +385,7 @@
               this.userTotals = res.data.data;
           })
       },
-      getUserNumFun () {
+      getArticleNumFun () {
            getArticleNum().then( res => {
               this.articleTotals = res.data.data;
           })

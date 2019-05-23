@@ -38,7 +38,7 @@
     <el-card class="operate-container" shadow="never">
       <i class="el-icon-tickets"></i>
       <span>数据列表</span>
-      <el-button size="mini" class="btn-add" @click="handleSelectBrand()">选择品牌</el-button>
+      <!-- <el-button size="mini" class="btn-add" @click="handleSelectBrand()">选择品牌</el-button> -->
     </el-card>
     <div class="table-container">
       <el-table ref="homeBrandTable"
@@ -47,11 +47,14 @@
                 @selection-change="handleSelectionChange"
                 v-loading="listLoading" border>
         <el-table-column type="selection" width="60" align="center"></el-table-column>
-        <el-table-column label="编号" width="120" align="center">
-          <template slot-scope="scope">{{scope.row.id}}</template>
+        <el-table-column label="编号" type="index" width="120" align="center">
+          <!-- <template slot-scope="scope">{{scope.row.id}}</template> -->
         </el-table-column>
         <el-table-column label="品牌名称" align="center">
           <template slot-scope="scope">{{scope.row.brandName}}</template>
+        </el-table-column>
+        <el-table-column label="品牌序号" align="center">
+          <template slot-scope="scope">{{scope.row.type}}</template>
         </el-table-column>
         <el-table-column label="是否推荐" width="200" align="center">
           <template slot-scope="scope">
@@ -63,18 +66,18 @@
           </el-switch>
           </template>
         </el-table-column>
-        <el-table-column label="排序" width="160" align="center">
+        <!-- <el-table-column label="排序" width="160" align="center">
           <template slot-scope="scope">{{scope.row.sort}}</template>
-        </el-table-column>
+        </el-table-column> -->
         <el-table-column label="状态" width="160" align="center">
           <template slot-scope="scope">{{scope.row.recommendStatus | formatRecommendStatus}}</template>
         </el-table-column>
         <el-table-column label="操作" width="180" align="center">
           <template slot-scope="scope">
-            <el-button size="mini"
+            <!-- <el-button size="mini"
                        type="text"
                        @click="handleEditSort(scope.$index, scope.row)">设置排序
-            </el-button>
+            </el-button> -->
             <el-button size="mini"
                        type="text"
                        @click="handleDelete(scope.$index, scope.row)">删除
@@ -171,6 +174,10 @@
 </template>
 <script>
   import {fetchList,updateRecommendStatus,deleteHomeBrand,createHomeBrand,updateHomeBrandSort} from '@/api/homeBrand';
+  import {addGoodsBrand, deleteGoodsBrandById,
+            updateGoodsBrandById, selectGoodsBrandById,
+            selectAllGoodsBrand
+    } from '@/api/api';
   import {fetchList as fetchBrandList} from '@/api/brand';
 
   const defaultListQuery = {
@@ -372,10 +379,10 @@
       },
       getList() {
         this.listLoading = true;
-        fetchList(this.listQuery).then(response => {
+        selectAllGoodsBrand(this.listQuery).then(response => {
           this.listLoading = false;
-          this.list = response.data.list;
-          this.total = response.data.total;
+          this.list = response.data.data;
+          this.total = response.data.data.length;
         })
       },
       updateRecommendStatusStatus(ids,status){

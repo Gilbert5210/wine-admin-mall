@@ -676,7 +676,7 @@
 <style lang='scss'>
 .table-container {
     .tag {
-        margin: 0 5px
+        margin: 5px
     }
 }
 </style>

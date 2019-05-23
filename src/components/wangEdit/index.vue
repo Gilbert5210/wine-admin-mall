@@ -26,7 +26,7 @@
                 this.editor.change = () => {          // 这里是change 不是官方文档中的 onchange
                 // 编辑区域内容变化时，实时打s印出当前内容
                     this.$emit('input',this.editor.txt.html());
-                    console.log("编辑器的文件变化",this.editor.txt.html())
+                    // console.log("编辑器的文件变化",this.editor.txt.html())
                 };
                 // debugger
                 this.editor.create()     // 生成编辑器

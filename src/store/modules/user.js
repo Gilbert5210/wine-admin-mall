@@ -35,7 +35,7 @@ const user = {
                 password: userInfo.password,
             }
             userLogin(params).then(response => {
-                const data = response.data
+                const data = response.data.data;
                 // const tokenStr = data.tokenHead+data.token
                 // setToken(tokenStr)
                 window.localStorage.setItem('userToken', JSON.stringify(data));

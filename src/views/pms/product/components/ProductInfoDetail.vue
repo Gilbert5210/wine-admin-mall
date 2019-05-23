@@ -327,6 +327,8 @@
         this.$refs[formName].validate((valid) => {
             if (valid) {
                 if (this.isEdit) {
+                    delete this.productInfo.isCollection;
+                    console.log('参数',this.productInfo);
                     updateGoodsById(this.productInfo).then( res => {
                         if (res.data.code) {
                             this.$message.error(res.data.msg || '更新商品基本信息失败');
